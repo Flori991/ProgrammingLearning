@@ -1,15 +1,14 @@
 name: Publish AirVPN API
 
 on:
-  push:
-    branches:
-      - main
-      - develop
-    paths:
-      - 'Go/air-vpn-api/**'
   release:
     types: [published]
   workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to build as edge'
+        required: true
+        default: 'develop'
 
 jobs:
   build:
