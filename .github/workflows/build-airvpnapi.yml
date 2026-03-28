@@ -1,14 +1,7 @@
-name: Publish AirVPN API
-
 on:
   release:
     types: [published]
   workflow_dispatch:
-    inputs:
-      branch:
-        description: 'Branch to build as edge'
-        required: true
-        default: 'develop'
 
 jobs:
   build:
@@ -19,7 +12,9 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
 
       - name: Docker meta
         id: meta
@@ -27,8 +22,8 @@ jobs:
         with:
           images: ghcr.io/flori991/airvpn-api
           tags: |
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
-            type=raw,value=edge,enable=${{ github.ref == 'refs/heads/develop' }}
+            type=raw,value=latest,enable=${{ github.event_name == 'release' }}
+            type=raw,value=edge,enable=${{ github.event_name == 'workflow_dispatch' }}
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
 
