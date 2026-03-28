@@ -5,78 +5,89 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 
-	types "github.com/Flori991/ProgrammingLearning/types"
+	"github.com/Flori991/ProgrammingLearning/types"
 )
 
-const API_URL = "https://airvpn.org/api/userinfo/?key="
-const ENV_API_KEY = "AIRVPN_API_KEY"
-
 func main() {
-	// Do the request and return json response
-	responsebytes := sendGetRequest()
-	if strings.Contains(string(responsebytes), "Not authorized") {
-		log.Fatal("API key is not valid. Please check your environment variable.")
+	mux := http.NewServeMux()
+	mux.HandleFunc("/dashboard", handleDashboardData)
+
+	log.Println("Starting server on port: " + SERVER_PORT)
+	err := http.ListenAndServe(":"+SERVER_PORT, mux)
+	if err != nil {
+		log.Println("Server failed to start:", err)
 	}
-	// Turn json response intro response type
-	userInfo := parseResponse(responsebytes)
+}
+
+func handleDashboardData(w http.ResponseWriter, r *http.Request) {
+	// Get API key from request header
+	API_KEY := r.Header.Get("API-KEY")
+	if API_KEY == "" {
+		w.Header().Set("x-missing-field", "API-KEY")
+		http.Error(w, "API key is missing", http.StatusBadRequest)
+		return
+	}
+	log.Println(API_KEY)
+
+	// Fetch UserInfo
+	userInfoResponseBytes, err := httpGet(AIRVPN_USERINFO_URL, API_KEY)
+	if err != nil {
+		log.Println("Failed to fetch user info:", err)
+		http.Error(w, "Failed to fetch user info", http.StatusInternalServerError)
+		return
+	}
+	if strings.Contains(string(userInfoResponseBytes), "Not authorized") {
+		http.Error(w, "API key is not valid", http.StatusUnauthorized)
+		return
+	}
+
+	//Fetch Server Status
+	statusResponseBytes, err := httpGet(AIRVPN_STATUS_URL)
+	if err != nil {
+		log.Println("Failed to fetch server status:", err)
+		http.Error(w, "Failed to fetch server status", http.StatusInternalServerError)
+		return
+	}
+
+	// Turn userinfo json response into response type
+	userInfo, err := safeJsonParse(userInfoResponseBytes, types.UserInfo{})
+	if err != nil {
+		log.Println("Failed to parse user info response:", err)
+		http.Error(w, "Failed to parse user info response", http.StatusInternalServerError)
+		return
+	}
 	if len(userInfo.Sessions) == 0 {
 		log.Println("No active sessions found.")
+		http.Error(w, "No active sessions found", http.StatusInternalServerError)
+		return
 	}
-	// Turn response into custom struct and serialize it for return
-	jsonSessionSummaries := serializeResponse(userInfo.Sessions)
 
-	log.Println("API call successful. Response:", jsonSessionSummaries)
-}
-
-func sendGetRequest() []byte {
-	log.Println("Starting API call...")
-	resp, err := http.Get(API_URL + os.Getenv(ENV_API_KEY))
-
+	// Turn status json response into response type
+	status, err := safeJsonParse(statusResponseBytes, types.Status{})
 	if err != nil {
-		log.Fatal(err)
+		log.Println("Failed to parse server status response:", err)
+		http.Error(w, "Failed to parse server status response", http.StatusInternalServerError)
+		return
 	}
-	defer resp.Body.Close()
-
-	log.Println("Response status:", resp.Status)
-	body, err := io.ReadAll(resp.Body)
-	return body
-}
-
-func parseResponse(body []byte) types.UserInfo {
-	var userInfo types.UserInfo
-	if err := json.Unmarshal(body, &userInfo); err != nil {
-		log.Fatal(err)
+	if len(status.Servers) == 0 {
+		log.Println("No server status information found.")
+		http.Error(w, "No server status information found", http.StatusInternalServerError)
+		return
 	}
-	return userInfo
-}
 
-func mapToSessionSummaries(sessions []types.Session) types.SessionSummaries {
-	var sessionSummaries []types.SessionSummary
-	for _, session := range sessions {
-		sessionSummaries = append(sessionSummaries, types.SessionSummary{
-			DeviceName:         session.DeviceName,
-			DeviceDescription:  session.DeviceDescription,
-			ExitIpv4:           session.ExitIpv4,
-			ServerName:         session.ServerName,
-			ServerCountry:      session.ServerCountry,
-			BytesRead:          session.BytesRead,
-			BytesWrite:         session.BytesWrite,
-			ConnectedSinceDate: session.ConnectedSinceDate,
-			ConnectedSinceUnix: session.ConnectedSinceUnix,
-		})
-	}
-	return types.SessionSummaries{
-		Sessions: sessionSummaries,
-	}
-}
+	// Merge responses into custom api struct
+	sessionSummaries := mergeResponsesIntoSummaries(userInfo.Sessions, status.Servers)
 
-func serializeResponse(sessions []types.Session) string {
-	json, err := json.Marshal(mapToSessionSummaries(sessions))
+	// Serialize for return
+	jsonSessionSummaries, err := json.Marshal(sessionSummaries)
 	if err != nil {
-		log.Fatal(err)
+		log.Println("Failed to serialize response:", err)
+		http.Error(w, "Failed to serialize response", http.StatusInternalServerError)
+		return
 	}
-	return string(json)
+
+	w.Header().Set("Content-Type", "application/json")
+	io.Writer.Write(w, jsonSessionSummaries)
 }
