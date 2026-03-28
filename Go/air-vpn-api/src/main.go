@@ -5,10 +5,12 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
+	"strings"
 )
 
 const API_URL = "https://airvpn.org/api/userinfo/?key="
-const API_KEY = "bf8ab1d1386c4854d0f580fede6f36c448d6e9e808cf6aabc9eb2b48166bdf6f"
+const ENV_API_KEY = "AIRVPN_API_KEY"
 
 type Session struct {
 	DeviceName         string      `json:"device_name"`
@@ -44,6 +46,9 @@ type Response struct {
 
 func main() {
 	body := sendGetRequest()
+	if strings.Contains(string(body), "Not authorized") {
+		log.Fatal("API key is not valid. Please check your environment variable.")
+	}
 	response := parseResponse(body)
 
 	if len(response.Sessions) > 0 {
@@ -53,7 +58,7 @@ func main() {
 
 func sendGetRequest() []byte {
 	log.Println("Starting API call...")
-	resp, err := http.Get(API_URL + API_KEY)
+	resp, err := http.Get(API_URL + os.Getenv(ENV_API_KEY))
 
 	if err != nil {
 		log.Fatal(err)
