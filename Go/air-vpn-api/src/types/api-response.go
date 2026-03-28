@@ -5,7 +5,7 @@ import "encoding/json"
 type SessionSummary struct {
 	DeviceName         string      `json:"device_name"`
 	DeviceDescription  string      `json:"device_description"`
-	EntryIpv4          string      `json:"entry_ipv4"`
+	ExitIpv4           string      `json:"exit_ipv4"`
 	ServerName         string      `json:"server_name"`
 	ServerCountry      string      `json:"server_country"`
 	BytesRead          json.Number `json:"bytes_read"`
