@@ -26,9 +26,9 @@ func main() {
 		log.Println("No active sessions found.")
 	}
 	// Turn response into custom struct and serialize it for return
-	json := serializeResponse(userInfo.Sessions)
+	jsonSessionSummaries := serializeResponse(userInfo.Sessions)
 
-	log.Println("API call successful. Response:", json)
+	log.Println("API call successful. Response:", jsonSessionSummaries)
 }
 
 func sendGetRequest() []byte {
@@ -53,17 +53,28 @@ func parseResponse(body []byte) types.UserInfo {
 	return userInfo
 }
 
-func mapToSessionSummary(session types.Session) types.SessionSummary {
-	return types.SessionSummary{
-		DeviceName:         session.DeviceName,
-		DeviceDescription:  session.DeviceDescription,
-		ConnectedSinceDate: session.ConnectedSinceDate,
-		ExitIp:             session.ExitIp,
+func mapToSessionSummaries(sessions []types.Session) types.SessionSummaries {
+	var sessionSummaries []types.SessionSummary
+	for _, session := range sessions {
+		sessionSummaries = append(sessionSummaries, types.SessionSummary{
+			DeviceName:         session.DeviceName,
+			DeviceDescription:  session.DeviceDescription,
+			ExitIpv4:           session.ExitIpv4,
+			ServerName:         session.ServerName,
+			ServerCountry:      session.ServerCountry,
+			BytesRead:          session.BytesRead,
+			BytesWrite:         session.BytesWrite,
+			ConnectedSinceDate: session.ConnectedSinceDate,
+			ConnectedSinceUnix: session.ConnectedSinceUnix,
+		})
+	}
+	return types.SessionSummaries{
+		Sessions: sessionSummaries,
 	}
 }
 
-func serializeResponse(response []types.Session) string {
-	json, err := json.Marshal(response)
+func serializeResponse(sessions []types.Session) string {
+	json, err := json.Marshal(mapToSessionSummaries(sessions))
 	if err != nil {
 		log.Fatal(err)
 	}
