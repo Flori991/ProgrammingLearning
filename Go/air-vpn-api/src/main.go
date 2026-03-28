@@ -44,15 +44,26 @@ type Response struct {
 	Connection json.RawMessage `json:"connection"`
 }
 
+type SessionSummary struct {
+	DeviceName         string `json:"device_name"`
+	DeviceDescription  string `json:"device_description"`
+	ConnectedSinceDate string `json:"connected_since_date"`
+	ExitIp             string `json:"exit_ip"`
+}
+
 func main() {
+	// Do the request and return json response
 	body := sendGetRequest()
 	if strings.Contains(string(body), "Not authorized") {
 		log.Fatal("API key is not valid. Please check your environment variable.")
 	}
+	// Turn json response intro response type
 	response := parseResponse(body)
+	// Turn response into custom struct and serialize it for return
+	json := serializeResponse(response)
 
 	if len(response.Sessions) > 0 {
-		log.Printf("%+v\n", response.Sessions[0])
+		log.Println(string(json))
 	}
 }
 
@@ -76,4 +87,12 @@ func parseResponse(body []byte) Response {
 		log.Fatal(err)
 	}
 	return resp
+}
+
+func serializeResponse(response Response) string {
+	json, err := json.Marshal(response)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return string(json)
 }
