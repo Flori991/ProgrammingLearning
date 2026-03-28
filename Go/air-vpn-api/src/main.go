@@ -29,7 +29,6 @@ func handleDashboardData(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "API key is missing", http.StatusBadRequest)
 		return
 	}
-	log.Println(API_KEY)
 
 	// Fetch UserInfo
 	userInfoResponseBytes, err := httpGet(AIRVPN_USERINFO_URL, API_KEY)
