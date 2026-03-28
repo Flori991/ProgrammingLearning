@@ -1,25 +1,58 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
+	"os"
+	"os/signal"
 	"strings"
+	"syscall"
+	"time"
 
 	"github.com/Flori991/ProgrammingLearning/types"
 )
 
 func main() {
 	// Initialize logger
+	logStartup("Starting up airvpn-api.")
+	logStartup("Initializing Log Level.")
 	initLogLevel()
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/dashboard", handleDashboardData)
 
-	logInfo("Starting server on port: " + SERVER_PORT)
-	err := http.ListenAndServe(":"+SERVER_PORT, mux)
-	if err != nil {
-		logError("Server failed to start:", err)
+	server := &http.Server{
+		Addr:    ":" + SERVER_PORT,
+		Handler: mux,
+	}
+
+	// Configure graceful shutdown
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		logStartup("Server starting on port: " + SERVER_PORT)
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			logError("Server failed to start", err)
+			os.Exit(1)
+		}
+	}()
+
+	logStartup("Server ready")
+
+	// Wait for interrupt signal to gracefully shutdown the server
+	<-stop
+
+	logStartup("Shutdown signal received, gracefully shutting down...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := server.Shutdown(ctx); err != nil {
+		logError("Server forced to shutdown", err)
+	} else {
+		logInfo("Server stopped cleanly")
 	}
 }
 
