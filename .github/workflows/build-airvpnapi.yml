@@ -1,3 +1,5 @@
+name: Publish AirVPN API
+
 on:
   release:
     types: [published]
