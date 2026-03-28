@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func sendGetRequest(apiUrl string, keyEnvVar ...string) []byte {
+func httpGet(apiUrl string, keyEnvVar ...string) []byte {
 	log.Println("Starting API call...")
 	// Create the HTTP client
 	client := &http.Client{}
