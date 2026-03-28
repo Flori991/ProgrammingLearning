@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"log"
 	"slices"
 
 	"github.com/Flori991/ProgrammingLearning/types"
@@ -34,9 +33,9 @@ func mergeResponsesIntoSummaries(sessions []types.Session, status []types.Server
 	}
 }
 
-func safeJsonParse[T any](body []byte, target T) T {
+func safeJsonParse[T any](body []byte, target T) (T, error) {
 	if err := json.Unmarshal(body, &target); err != nil {
-		log.Fatal("Something went wrong parsing a json response:", err)
+		return target, err
 	}
-	return target
+	return target, nil
 }

@@ -4,11 +4,10 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
 	"time"
 )
 
-func httpGet(apiUrl string, keyEnvVar ...string) []byte {
+func httpGet(apiUrl string, apiKey ...string) ([]byte, error) {
 	log.Println("Starting API call...")
 	// Create the HTTP client
 	client := &http.Client{}
@@ -17,18 +16,18 @@ func httpGet(apiUrl string, keyEnvVar ...string) []byte {
 	//Create the HTTP request
 	req, err := http.NewRequest(http.MethodGet, apiUrl, nil)
 	if err != nil {
-		log.Fatal("Something went wrong creating the request:", err)
+		return nil, err
 	}
 
 	// If API key specified, add it as header
-	if len(keyEnvVar) > 0 {
-		req.Header.Set("API-KEY", os.Getenv(keyEnvVar[0]))
+	if len(apiKey) > 0 {
+		req.Header.Set("API-KEY", apiKey[0])
 	}
 
 	// Actually do the request
 	response, err := client.Do(req)
 	if err != nil {
-		log.Fatal("The request failed:", err)
+		return nil, err
 	}
 
 	// Log the response status code
@@ -36,5 +35,8 @@ func httpGet(apiUrl string, keyEnvVar ...string) []byte {
 	defer response.Body.Close()
 	log.Println("Response status:", response.Status)
 	body, err := io.ReadAll(response.Body)
-	return body
+	if err != nil {
+		return nil, err
+	}
+	return body, nil
 }
