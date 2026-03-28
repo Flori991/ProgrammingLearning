@@ -2,13 +2,12 @@ package main
 
 import (
 	"io"
-	"log"
 	"net/http"
 	"time"
 )
 
 func httpGet(apiUrl string, apiKey ...string) ([]byte, error) {
-	log.Println("Starting API call...")
+	logInfo("Starting API call...")
 	// Create the HTTP client
 	client := &http.Client{}
 	client.Timeout = time.Second * 3
@@ -33,7 +32,7 @@ func httpGet(apiUrl string, apiKey ...string) ([]byte, error) {
 	// Log the response status code
 	// Read the response body and return it
 	defer response.Body.Close()
-	log.Println("Response status:", response.Status)
+	logInfo("Response status: " + response.Status)
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		return nil, err

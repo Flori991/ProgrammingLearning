@@ -1,0 +1,98 @@
+- type: custom-api
+  title: VPN Sessions
+  cache: 10m
+  options:
+    api-url: ${URL_AIRVPN_API}
+    api-key: ${KEY_AIRVPN}
+  template: |
+    {{/* Required config options */}}
+    {{ $apiURL := .Options.StringOr "api-url" "" }}
+    {{ $apiKey := .Options.StringOr "api-key" "" }}
+
+    {{ define "errorMsg" }}
+      <div class="widget-error-header">
+        <div class="color-negative size-h3">ERROR</div>
+      </div>
+      <p class="break-all">{{ . }}</p>
+    {{ end }}
+
+    {{ if or (eq $apiURL "") (eq $apiKey "") }}
+      {{ template "errorMsg" "api-url and api-key options are required." }}
+    {{ else }}
+
+      {{ $response := newRequest $apiURL
+          | withHeader "Accept" "application/json"
+          | withHeader "API-KEY" $apiKey
+          | getResponse }}
+
+      {{ $sessions := $response.JSON.Array "sessions" }}
+
+      {{ if eq (len $sessions) 0 }}
+        <p>No active VPN sessions.</p>
+      {{ else }}
+        <div class="flex flex-column" style="gap: 1rem;">
+          {{ range $sessions }}
+
+            {{ $bandwidthUsed := .Int "bandwidth_used" }}
+            {{ $bandwidthMax  := .Int "bandwidth_max" }}
+            {{ $barWidth := 0 }}
+            {{ if gt $bandwidthMax 0 }}
+              {{ $barWidth = div (mul $bandwidthUsed 100) $bandwidthMax }}
+            {{ end }}
+
+            {{ $bytesRead  := .Float "bytes_read" }}
+            {{ $bytesWrite := .Float "bytes_write" }}
+            {{ $gbDownload := div $bytesWrite 1073741824.0 }}
+            {{ $gbUpload   := div $bytesRead  1073741824.0 }}
+
+            <div class="widget-content-frame" style="padding: 1rem 1.25rem;">
+
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:14px;">
+                <div style="width:8px; height:8px; border-radius:50%; background:var(--color-positive); flex-shrink:0;"></div>
+                <span class="size-h4 bold">{{ .String "device_name" }}</span>
+              </div>
+
+              <div style="margin-bottom:14px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                  <span class="size-h6 color-subdue">Bandwidth</span>
+                  <span class="size-h6 color-subdue">{{ $bandwidthUsed }} / {{ $bandwidthMax }} Mbps</span>
+                </div>
+                <div style="height:6px; border-radius:99px; background:var(--color-widget-background); overflow:hidden;">
+                  <div style="width:{{ $barWidth }}%; height:100%; background:var(--color-positive); border-radius:99px;"></div>
+                </div>
+              </div>
+
+              <div style="display:flex; flex-direction:column; gap:8px; border-top:1px solid var(--color-widget-border); padding-top:12px;">
+
+                <div style="display:flex; justify-content:space-between;">
+                  <span class="size-h6 color-subdue">Server</span>
+                  <span class="size-h6">{{ .String "server_name" }}, {{ .String "server_country" }}</span>
+                </div>
+
+                <div style="display:flex; justify-content:space-between;">
+                  <span class="size-h6 color-subdue">Connected since</span>
+                  <span class="size-h6">{{ .String "connected_since_date" }}</span>
+                </div>
+
+                <div style="display:flex; justify-content:space-between;">
+                  <span class="size-h6 color-subdue">Downloaded</span>
+                  <span class="size-h6">{{ printf "%.2f" $gbDownload }} GB</span>
+                </div>
+
+                <div style="display:flex; justify-content:space-between;">
+                  <span class="size-h6 color-subdue">Uploaded</span>
+                  <span class="size-h6">{{ printf "%.2f" $gbUpload }} GB</span>
+                </div>
+
+                <div style="display:flex; justify-content:space-between;">
+                  <span class="size-h6 color-subdue">Exit IP</span>
+                  <span class="size-h6">{{ .String "exit_ipv4" }}</span>
+                </div>
+
+              </div>
+            </div>
+          {{ end }}
+        </div>
+      {{ end }}
+
+    {{ end }}
