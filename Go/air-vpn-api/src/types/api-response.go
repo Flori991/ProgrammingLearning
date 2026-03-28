@@ -8,6 +8,8 @@ type SessionSummary struct {
 	ExitIpv4           string      `json:"exit_ipv4"`
 	ServerName         string      `json:"server_name"`
 	ServerCountry      string      `json:"server_country"`
+	BandwidthUsed      int         `json:"bandwidth_used"`
+	BandwidthMax       int         `json:"bandwidth_max"`
 	BytesRead          json.Number `json:"bytes_read"`
 	BytesWrite         json.Number `json:"bytes_write"`
 	ConnectedSinceDate string      `json:"connected_since_date"`
