@@ -8,6 +8,10 @@ import (
 
 var logLevel = LEVEL_WARNING
 
+func logStartup(message string) {
+	log.Println(LOG_STARTUP, message)
+}
+
 func initLogLevel() {
 	level := os.Getenv("LOG_LEVEL")
 	switch strings.ToLower(level) {

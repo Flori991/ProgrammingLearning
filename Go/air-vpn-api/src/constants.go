@@ -8,6 +8,7 @@ const LOG_ERROR = "[ERROR] "
 const LOG_WARNING = "[WARNING] "
 const LOG_INFO = "[INFO] "
 const LOG_DEBUG = "[DEBUG] "
+const LOG_STARTUP = "[STARTUP] "
 
 const (
 	LEVEL_ERROR   = 0
