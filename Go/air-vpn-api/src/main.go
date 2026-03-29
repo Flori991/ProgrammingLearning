@@ -15,11 +15,19 @@ import (
 )
 
 func main() {
-	// Initialize logger
+	initialize()
+	startServer()
+}
+
+func initialize() {
 	logStartup("Starting up airvpn-api.")
+
+	// Initialize logger
 	logStartup("Initializing Log Level.")
 	initLogLevel()
+}
 
+func startServer() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/dashboard", handleDashboardData)
 
