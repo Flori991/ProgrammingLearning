@@ -10,7 +10,8 @@ import (
 )
 
 func handleDashboardData(w http.ResponseWriter, r *http.Request) {
-	logInfo("Received request for dashboard data.")
+	logInfo("Received request for dashboard data from: " + r.RemoteAddr)
+
 	// Get API key from request header
 	API_KEY := r.Header.Get("API-KEY")
 	if API_KEY == "" {
