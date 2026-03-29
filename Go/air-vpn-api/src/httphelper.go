@@ -3,11 +3,13 @@ package main
 import (
 	"io"
 	"net/http"
+	"path"
 	"time"
 )
 
 func httpGet(apiUrl string, apiKey ...string) ([]byte, error) {
-	logInfo("Starting API call...")
+	requestName := path.Base(apiUrl)
+	logDebug("Starting API call to: " + requestName)
 	// Create the HTTP client
 	client := &http.Client{}
 	client.Timeout = time.Second * 3
@@ -24,15 +26,17 @@ func httpGet(apiUrl string, apiKey ...string) ([]byte, error) {
 	}
 
 	// Actually do the request
+	startTime := time.Now()
 	response, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
+	logDebug("API call for " + requestName + " completed in " + time.Since(startTime).String())
 
 	// Log the response status code
 	// Read the response body and return it
 	defer response.Body.Close()
-	logInfo("Response status: " + response.Status)
+	logDebug("Response status for " + requestName + ": " + response.Status)
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		return nil, err

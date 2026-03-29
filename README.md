@@ -12,6 +12,8 @@ services:
     image: ghcr.io/flori991/airvpn-api:latest
     container_name: airvpn-api
     restart: unless-stopped
+    ports:
+      - 3000:3000
     environment:
       - LOG_LEVEL=warning
       - PORT=3000
