@@ -65,9 +65,9 @@ func startServer() {
 	defer cancel()
 
 	if err := server.Shutdown(ctx); err != nil {
-		logError("Server forced to shutdown", err)
+		logStartup("Server forced to shutdown")
 	} else {
-		logInfo("Server stopped cleanly")
+		logStartup("Server stopped cleanly")
 	}
 }
 
