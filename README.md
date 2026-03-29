@@ -17,12 +17,14 @@ services:
     environment:
       - LOG_LEVEL=warning
       - PORT=3000
+      - CACHE_TTL_SECONDS=300
 ```
 
 ### Configuration
 Everything ticked is already available, unticked is still planned.
 - [x] `LOG_LEVEL`= `error | warning | info | debug`
 - [x] `PORT` = `3000` (default port: 3000)
+- [x] `CACHE_TTL_SECONDS` = `300` (default 300 seconds)
 
 ### Usage
 This repo contains a [glance `custom-api`](https://github.com/glanceapp/glance/blob/main/docs/configuration.md#custom-api) widget called [`airvpn-dash`](/Go/air-vpn-api/airvpn-dash.yml) that uses this API to request and show your AIRVPN sessions, feel free to use it and tinker with it. This is not yet fully tested and I only made it for my own consumption, so use at your own risk.
