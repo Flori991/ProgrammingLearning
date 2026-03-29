@@ -28,11 +28,18 @@ func initialize() {
 }
 
 func startServer() {
+	// Try reading port from environment variable
+	serverPort := os.Getenv(ENV_PORT)
+	if serverPort == "" {
+		logWarning("PORT environment variable not set, defaulting to 3000")
+		serverPort = "3000"
+	}
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("/dashboard", handleDashboardData)
 
 	server := &http.Server{
-		Addr:    ":" + SERVER_PORT,
+		Addr:    ":" + serverPort,
 		Handler: mux,
 	}
 
@@ -40,7 +47,7 @@ func startServer() {
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
 	go func() {
-		logStartup("Server starting on port: " + SERVER_PORT)
+		logStartup("Server starting on port: " + serverPort)
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			logError("Server failed to start", err)
 			os.Exit(1)

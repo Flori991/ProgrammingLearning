@@ -3,7 +3,7 @@ package main
 const AIRVPN_USERINFO_URL = "https://airvpn.org/api/userinfo/?key="
 const AIRVPN_STATUS_URL = "https://airvpn.org/api/status/"
 const ENV_LOG_LEVEL = "LOG_LEVEL"
-const SERVER_PORT = "3000"
+const ENV_PORT = "PORT"
 
 const LOG_ERROR = "[ERROR] "
 const LOG_WARNING = "[WARNING] "
