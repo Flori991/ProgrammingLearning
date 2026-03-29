@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -12,6 +13,8 @@ import (
 func handleDashboardData(w http.ResponseWriter, r *http.Request) {
 	logInfo("Received request for dashboard data. ")
 	logInfo("Request received from: " + getAccessIp(r))
+
+	fmt.Println(r.Header)
 
 	// Get API key from request header
 	API_KEY := r.Header.Get("API-KEY")
