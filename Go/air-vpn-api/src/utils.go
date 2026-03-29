@@ -42,11 +42,11 @@ func safeJsonParse[T any](body []byte, target T) (T, error) {
 	return target, nil
 }
 
-func getAccessIp(r *http.Request) (string, error) {
+func getAccessIp(r *http.Request) string {
 	host, _, err := net.SplitHostPort(r.RemoteAddr)
 	if err != nil {
 		logError("Couldn't parse the remote address of this request.")
-		return "", err
+		return r.RemoteAddr
 	}
-	return host, nil
+	return host
 }

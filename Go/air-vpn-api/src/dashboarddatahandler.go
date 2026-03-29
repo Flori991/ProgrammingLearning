@@ -11,9 +11,7 @@ import (
 
 func handleDashboardData(w http.ResponseWriter, r *http.Request) {
 	logInfo("Received request for dashboard data. ")
-	if ip, err := getAccessIp(r); err == nil {
-		logInfo("Request received from: " + ip)
-	}
+	logInfo("Request received from: " + getAccessIp(r))
 
 	// Get API key from request header
 	API_KEY := r.Header.Get("API-KEY")
