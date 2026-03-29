@@ -5,9 +5,14 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
+
+	"github.com/Flori991/ProgrammingLearning/cache"
 )
+
+var appCache *cache.Cache
 
 func main() {
 	initialize()
@@ -20,6 +25,24 @@ func initialize() {
 	// Initialize logger
 	logStartup("Initializing Log Level.")
 	initLogLevel()
+
+	// Initialize cache
+	logStartup("Initializing Cache.")
+	initCache()
+}
+
+func initCache() {
+	cacheTtl, err := strconv.Atoi(os.Getenv(ENV_CACHE_TTL_SECONDS))
+	if err != nil {
+		logWarning("Invalid CACHE_TTL_SECONDS environment variable, using default of 5 minutes.")
+		cacheTtl = 300
+	}
+	ttl := time.Duration(cacheTtl) * time.Second
+
+	appCache = &cache.Cache{
+		Entries: make(map[string]cache.CacheEntry),
+		Ttl:     ttl,
+	}
 }
 
 func startServer() {
