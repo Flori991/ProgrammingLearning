@@ -13,7 +13,7 @@ func logStartup(message string) {
 }
 
 func initLogLevel() {
-	level := os.Getenv("LOG_LEVEL")
+	level := os.Getenv(ENV_LOG_LEVEL)
 	switch strings.ToLower(level) {
 	case "error", "0":
 		logLevel = LEVEL_ERROR
