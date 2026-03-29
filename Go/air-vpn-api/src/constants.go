@@ -1,6 +1,6 @@
 package main
 
-const AIRVPN_USERINFO_URL = "https://airvpn.org/api/userinfo/?key="
+const AIRVPN_USERINFO_URL = "https://airvpn.org/api/userinfo/"
 const AIRVPN_STATUS_URL = "https://airvpn.org/api/status/"
 const ENV_LOG_LEVEL = "LOG_LEVEL"
 const ENV_PORT = "PORT"
