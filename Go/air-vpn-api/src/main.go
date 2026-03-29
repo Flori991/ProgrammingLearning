@@ -5,59 +5,41 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"strconv"
 	"syscall"
 	"time"
 
 	"github.com/Flori991/ProgrammingLearning/cache"
 )
 
-var appCache *cache.Cache
-
 func main() {
+	logStartup("Starting up airvpn-api.")
+
 	initialize()
 	startServer()
 }
 
 func initialize() {
-	logStartup("Starting up airvpn-api.")
-
-	// Initialize logger
-	logStartup("Initializing Log Level.")
-	initLogLevel()
-
+	// Initialize configuration
+	initConfig()
 	// Initialize cache
-	logStartup("Initializing Cache.")
 	initCache()
 }
 
 func initCache() {
-	cacheTtl, err := strconv.Atoi(os.Getenv(ENV_CACHE_TTL_SECONDS))
-	if err != nil {
-		logWarning("Invalid CACHE_TTL_SECONDS environment variable, using default of 5 minutes.")
-		cacheTtl = 300
-	}
-	ttl := time.Duration(cacheTtl) * time.Second
+	logStartup("Initializing Cache.")
 
 	appCache = &cache.Cache{
 		Entries: make(map[string]cache.CacheEntry),
-		Ttl:     ttl,
+		Ttl:     config.CacheTtlSeconds,
 	}
 }
 
 func startServer() {
-	// Try reading port from environment variable
-	serverPort := os.Getenv(ENV_PORT)
-	if serverPort == "" {
-		logWarning("PORT environment variable not set, defaulting to 3000")
-		serverPort = "3000"
-	}
-
 	mux := http.NewServeMux()
 	mux.HandleFunc("/dashboard", handleDashboardData)
 
 	server := &http.Server{
-		Addr:    ":" + serverPort,
+		Addr:    ":" + config.Port,
 		Handler: mux,
 	}
 
@@ -65,7 +47,7 @@ func startServer() {
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
 	go func() {
-		logStartup("Server starting on port: " + serverPort)
+		logStartup("Server starting on port: " + config.Port)
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			logError("Server failed to start", err)
 			os.Exit(1)

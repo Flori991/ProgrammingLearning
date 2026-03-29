@@ -1,5 +1,10 @@
 package main
 
+import "github.com/Flori991/ProgrammingLearning/cache"
+
+var appCache *cache.Cache
+var config *Config
+
 const AIRVPN_USERINFO_URL = "https://airvpn.org/api/userinfo/"
 const AIRVPN_STATUS_URL = "https://airvpn.org/api/status/"
 const ENV_LOG_LEVEL = "LOG_LEVEL"
