@@ -2,6 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	"net"
+	"net/http"
 	"slices"
 
 	"github.com/Flori991/ProgrammingLearning/types"
@@ -38,4 +40,13 @@ func safeJsonParse[T any](body []byte, target T) (T, error) {
 		return target, err
 	}
 	return target, nil
+}
+
+func getAccessIp(r *http.Request) (string, error) {
+	host, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		logError("Couldn't parse the remote address of this request.")
+		return "", err
+	}
+	return host, nil
 }
