@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"io"
 	"net/http"
 	"strings"
 
@@ -51,7 +50,7 @@ func handleDashboardData(w http.ResponseWriter, r *http.Request) {
 	if len(userInfo.Sessions) == 0 {
 		logWarning("No active sessions found.")
 		w.Header().Set("Content-Type", "application/json")
-		io.Writer.Write(w, []byte("[]"))
+		w.Write([]byte("[]"))
 		return
 	}
 
@@ -64,7 +63,8 @@ func handleDashboardData(w http.ResponseWriter, r *http.Request) {
 	}
 	if len(status.Servers) == 0 {
 		logWarning("No server status information found.")
-		http.Error(w, "No server status information found", http.StatusInternalServerError)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte("[]"))
 		return
 	}
 
@@ -80,5 +80,5 @@ func handleDashboardData(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	io.Writer.Write(w, jsonSessionSummaries)
+	w.Write(jsonSessionSummaries)
 }
