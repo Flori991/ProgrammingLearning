@@ -36,8 +36,8 @@ func startServer() {
 	server := &http.Server{
 		Addr:         ":" + config.Port,
 		Handler:      mux,
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 5 * time.Second,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  20 * time.Second,
 	}
 
