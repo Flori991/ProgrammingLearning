@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strings"
+	"sync"
 
 	"github.com/Flori991/ProgrammingLearning/types"
 )
@@ -19,10 +20,29 @@ func handleDashboardData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Fetch UserInfo
-	userInfoResponseBytes, err := httpGet(AirVPNUserInfoURL, apiKey)
-	if err != nil {
-		logError("Failed to fetch user info:", err)
+	// Fetch info concurrently
+	var (
+		userInfoResponseBytes []byte
+		statusResponseBytes   []byte
+		userInfoErr           error
+		statusErr             error
+		wg                    sync.WaitGroup
+	)
+
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		userInfoResponseBytes, userInfoErr = httpGet(AirVPNUserInfoURL, apiKey)
+	}()
+	go func() {
+		defer wg.Done()
+		statusResponseBytes, statusErr = httpGet(AirVPNStatusURL)
+	}()
+	wg.Wait()
+
+	// GetUserInfo errors
+	if userInfoErr != nil {
+		logError("Failed to fetch user info:", userInfoErr)
 		http.Error(w, "Failed to fetch user info", http.StatusInternalServerError)
 		return
 	}
@@ -32,10 +52,9 @@ func handleDashboardData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//Fetch Server Status
-	statusResponseBytes, err := httpGet(AirVPNStatusURL, apiKey)
-	if err != nil {
-		logError("Failed to fetch server status:", err)
+	// GetStatus errors
+	if statusErr != nil {
+		logError("Failed to fetch server status:", statusErr)
 		http.Error(w, "Failed to fetch server status", http.StatusInternalServerError)
 		return
 	}
