@@ -12,8 +12,15 @@ type CacheEntry struct {
 
 type Cache struct {
 	lock    sync.RWMutex
-	Entries map[string]CacheEntry
-	Ttl     time.Duration
+	entries map[string]CacheEntry
+	ttl     time.Duration
+}
+
+func NewCache(ttl time.Duration) *Cache {
+	return &Cache{
+		entries: make(map[string]CacheEntry),
+		ttl:     ttl,
+	}
 }
 
 func (cache *Cache) Get(key string) ([]byte, bool) {
@@ -22,8 +29,8 @@ func (cache *Cache) Get(key string) ([]byte, bool) {
 	defer cache.lock.RUnlock()
 
 	// Getting cache entry
-	entry, ok := cache.Entries[key]
-	if !ok || time.Since(entry.fetchedAt) > cache.Ttl {
+	entry, ok := cache.entries[key]
+	if !ok || time.Since(entry.fetchedAt) > cache.ttl {
 		return nil, false
 	}
 	return entry.data, true
@@ -33,7 +40,7 @@ func (cache *Cache) Set(key string, data []byte) {
 	cache.lock.Lock()
 	defer cache.lock.Unlock()
 
-	cache.Entries[key] = CacheEntry{
+	cache.entries[key] = CacheEntry{
 		data:      data,
 		fetchedAt: time.Now(),
 	}
