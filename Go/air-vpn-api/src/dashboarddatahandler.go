@@ -50,7 +50,8 @@ func handleDashboardData(w http.ResponseWriter, r *http.Request) {
 	}
 	if len(userInfo.Sessions) == 0 {
 		logWarning("No active sessions found.")
-		http.Error(w, "No active sessions found", http.StatusInternalServerError)
+		w.Header().Set("Content-Type", "application/json")
+		io.Writer.Write(w, []byte("[]"))
 		return
 	}
 
