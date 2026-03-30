@@ -26,7 +26,7 @@ func initialize() {
 
 func initCache() {
 	logStartup("Initializing Cache.")
-	appCache = cache.NewCache(config.CacheTtlSeconds)
+	appCache = cache.NewCache(config.CacheTtl)
 }
 
 func startServer() {
