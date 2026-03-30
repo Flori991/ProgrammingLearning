@@ -10,8 +10,13 @@ import (
 func mergeResponsesIntoSummaries(sessions []types.Session, status []types.ServerStatus) types.SessionSummaries {
 	var sessionSummaries []types.SessionSummary
 	for _, session := range sessions {
-
 		index := slices.IndexFunc(status, func(s types.ServerStatus) bool { return s.ServerName == session.ServerName })
+
+		if index == -1 {
+			logWarning("Server of session not found in status report: " + session.ServerName)
+			continue
+		}
+
 		matchingServerStatus := status[index]
 
 		sessionSummaries = append(sessionSummaries, types.SessionSummary{
