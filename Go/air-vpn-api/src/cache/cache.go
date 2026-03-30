@@ -40,8 +40,18 @@ func (cache *Cache) Set(key string, data []byte) {
 	cache.lock.Lock()
 	defer cache.lock.Unlock()
 
+	cleanupCache(cache)
+
 	cache.entries[key] = CacheEntry{
 		data:      data,
 		fetchedAt: time.Now(),
+	}
+}
+
+func cleanupCache(cache *Cache) {
+	for key, entry := range cache.entries {
+		if time.Since(entry.fetchedAt) > cache.ttl {
+			delete(cache.entries, key)
+		}
 	}
 }
