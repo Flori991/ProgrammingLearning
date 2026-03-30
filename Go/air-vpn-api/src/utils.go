@@ -8,7 +8,7 @@ import (
 )
 
 func mergeResponsesIntoSummaries(sessions []types.Session, status []types.ServerStatus) types.SessionSummaries {
-	var sessionSummaries []types.SessionSummary
+	sessionSummaries := make([]types.SessionSummary, 0)
 	for _, session := range sessions {
 		index := slices.IndexFunc(status, func(s types.ServerStatus) bool { return s.ServerName == session.ServerName })
 
