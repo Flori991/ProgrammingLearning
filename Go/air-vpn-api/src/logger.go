@@ -5,33 +5,33 @@ import (
 )
 
 func logStartup(message string) {
-	log.Println(LOG_STARTUP, message)
+	log.Println(LogStartup, message)
 }
 
 func logDebug(message string) {
-	if config.LogLevel >= LEVEL_DEBUG {
-		log.Println(LOG_DEBUG, message)
+	if config.LogLevel >= LevelDebug {
+		log.Println(LogDebug, message)
 	}
 }
 
 func logInfo(message string) {
-	if config.LogLevel >= LEVEL_INFO {
-		log.Println(LOG_INFO, message)
+	if config.LogLevel >= LevelInfo {
+		log.Println(LogInfo, message)
 	}
 }
 
 func logWarning(message string) {
-	if config.LogLevel >= LEVEL_WARNING {
-		log.Println(LOG_WARNING, message)
+	if config.LogLevel >= LevelWarning {
+		log.Println(LogWarning, message)
 	}
 }
 
 func logError(message string, err ...error) {
-	if config.LogLevel >= LEVEL_ERROR {
+	if config.LogLevel >= LevelError {
 		if len(err) > 0 {
-			log.Println(LOG_ERROR, message, err[0])
+			log.Println(LogError, message, err[0])
 		} else {
-			log.Println(LOG_ERROR, message)
+			log.Println(LogError, message)
 		}
 	}
 }

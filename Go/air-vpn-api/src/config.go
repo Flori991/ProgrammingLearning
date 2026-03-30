@@ -23,7 +23,7 @@ func initConfig() {
 }
 
 func parsePort() string {
-	port := os.Getenv(ENV_PORT)
+	port := os.Getenv(EnvPort)
 	if _, err := strconv.Atoi(port); err != nil || port == "" {
 		logStartup("Invalid PORT, defaulting to 3000")
 		return "3000"
@@ -32,7 +32,7 @@ func parsePort() string {
 }
 
 func parseCacheTTL() time.Duration {
-	seconds, err := strconv.Atoi(os.Getenv(ENV_CACHE_TTL_SECONDS))
+	seconds, err := strconv.Atoi(os.Getenv(EnvCacheTTLSeconds))
 	if err != nil {
 		logStartup("Invalid CACHE_TTL_SECONDS, defaulting to 300 seconds")
 		return 300 * time.Second
@@ -41,17 +41,17 @@ func parseCacheTTL() time.Duration {
 }
 
 func parseLogLevel() int {
-	switch strings.ToLower(os.Getenv(ENV_LOG_LEVEL)) {
+	switch strings.ToLower(os.Getenv(EnvLogLevel)) {
 	case "error", "0":
-		return LEVEL_ERROR
+		return LevelError
 	case "warning", "1":
-		return LEVEL_WARNING
+		return LevelWarning
 	case "info", "2":
-		return LEVEL_INFO
+		return LevelInfo
 	case "debug", "3":
-		return LEVEL_DEBUG
+		return LevelDebug
 	default:
 		logStartup("Invalid LOG_LEVEL, defaulting to WARNING")
-		return LEVEL_WARNING
+		return LevelWarning
 	}
 }

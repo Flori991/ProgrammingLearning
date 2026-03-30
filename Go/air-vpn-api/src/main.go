@@ -11,6 +11,9 @@ import (
 	"github.com/Flori991/ProgrammingLearning/cache"
 )
 
+var appCache *cache.Cache
+var config *Config
+
 func main() {
 	logStartup("Starting up airvpn-api.")
 	initialize()

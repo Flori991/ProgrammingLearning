@@ -1,25 +1,20 @@
 package main
 
-import "github.com/Flori991/ProgrammingLearning/cache"
+const AirVPNUserInfoURL = "https://airvpn.org/api/userinfo/"
+const AirVPNStatusURL = "https://airvpn.org/api/status/"
+const EnvLogLevel = "LOG_LEVEL"
+const EnvPort = "PORT"
+const EnvCacheTTLSeconds = "CACHE_TTL_SECONDS"
 
-var appCache *cache.Cache
-var config *Config
-
-const AIRVPN_USERINFO_URL = "https://airvpn.org/api/userinfo/"
-const AIRVPN_STATUS_URL = "https://airvpn.org/api/status/"
-const ENV_LOG_LEVEL = "LOG_LEVEL"
-const ENV_PORT = "PORT"
-const ENV_CACHE_TTL_SECONDS = "CACHE_TTL_SECONDS"
-
-const LOG_ERROR = "[ERROR] "
-const LOG_WARNING = "[WARNING] "
-const LOG_INFO = "[INFO] "
-const LOG_DEBUG = "[DEBUG] "
-const LOG_STARTUP = "[STARTUP] "
+const LogError = "[ERROR] "
+const LogWarning = "[WARNING] "
+const LogInfo = "[INFO] "
+const LogDebug = "[DEBUG] "
+const LogStartup = "[STARTUP] "
 
 const (
-	LEVEL_ERROR   = 0
-	LEVEL_WARNING = 1
-	LEVEL_INFO    = 2
-	LEVEL_DEBUG   = 3
+	LevelError   = 0
+	LevelWarning = 1
+	LevelInfo    = 2
+	LevelDebug   = 3
 )

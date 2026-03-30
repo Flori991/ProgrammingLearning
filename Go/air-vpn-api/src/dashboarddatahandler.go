@@ -11,8 +11,8 @@ import (
 func handleDashboardData(w http.ResponseWriter, r *http.Request) {
 	logInfo("Received request for dashboard data.")
 	// Get API key from request header
-	API_KEY := r.Header.Get("API-KEY")
-	if API_KEY == "" {
+	apiKey := r.Header.Get("API-KEY")
+	if apiKey == "" {
 		logError("API key is missing")
 		w.Header().Set("x-missing-field", "API-KEY")
 		http.Error(w, "API key is missing", http.StatusBadRequest)
@@ -20,7 +20,7 @@ func handleDashboardData(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Fetch UserInfo
-	userInfoResponseBytes, err := httpGet(AIRVPN_USERINFO_URL, API_KEY)
+	userInfoResponseBytes, err := httpGet(AirVPNUserInfoURL, apiKey)
 	if err != nil {
 		logError("Failed to fetch user info:", err)
 		http.Error(w, "Failed to fetch user info", http.StatusInternalServerError)
@@ -33,7 +33,7 @@ func handleDashboardData(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//Fetch Server Status
-	statusResponseBytes, err := httpGet(AIRVPN_STATUS_URL)
+	statusResponseBytes, err := httpGet(AirVPNStatusURL, apiKey)
 	if err != nil {
 		logError("Failed to fetch server status:", err)
 		http.Error(w, "Failed to fetch server status", http.StatusInternalServerError)
