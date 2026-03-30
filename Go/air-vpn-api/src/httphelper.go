@@ -9,6 +9,10 @@ import (
 	"time"
 )
 
+var httpClient = &http.Client{
+	Timeout: time.Second * 3,
+}
+
 func httpGet(apiUrl string, apiKey ...string) ([]byte, error) {
 	requestName := path.Base(apiUrl)
 
@@ -25,9 +29,6 @@ func httpGet(apiUrl string, apiKey ...string) ([]byte, error) {
 	}
 
 	logDebug("Starting API call to: " + requestName)
-	// Create the HTTP client
-	client := &http.Client{}
-	client.Timeout = time.Second * 3
 
 	//Create the HTTP request
 	req, err := http.NewRequest(http.MethodGet, apiUrl, nil)
@@ -42,7 +43,7 @@ func httpGet(apiUrl string, apiKey ...string) ([]byte, error) {
 
 	// Actually do the request
 	startTime := time.Now()
-	response, err := client.Do(req)
+	response, err := httpClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
