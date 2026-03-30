@@ -34,8 +34,11 @@ func startServer() {
 	mux.HandleFunc("/dashboard", handleDashboardData)
 
 	server := &http.Server{
-		Addr:    ":" + config.Port,
-		Handler: mux,
+		Addr:         ":" + config.Port,
+		Handler:      mux,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 5 * time.Second,
+		IdleTimeout:  20 * time.Second,
 	}
 
 	// Configure graceful shutdown
