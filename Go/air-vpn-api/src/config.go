@@ -44,6 +44,8 @@ func parseLogLevel() int {
 	switch strings.ToLower(os.Getenv(ENV_LOG_LEVEL)) {
 	case "error", "0":
 		return LEVEL_ERROR
+	case "warning", "1":
+		return LEVEL_WARNING
 	case "info", "2":
 		return LEVEL_INFO
 	case "debug", "3":
