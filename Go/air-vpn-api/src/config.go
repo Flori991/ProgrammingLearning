@@ -8,17 +8,17 @@ import (
 )
 
 type Config struct {
-	Port            string
-	CacheTtlSeconds time.Duration
-	LogLevel        int
+	Port     string
+	CacheTtl time.Duration
+	LogLevel int
 }
 
 func initConfig() {
 	logStartup("Initializing configuration.")
 	config = &Config{
-		Port:            parsePort(),
-		CacheTtlSeconds: parseCacheTTL(),
-		LogLevel:        parseLogLevel(),
+		Port:     parsePort(),
+		CacheTtl: parseCacheTTL(),
+		LogLevel: parseLogLevel(),
 	}
 }
 
@@ -44,6 +44,8 @@ func parseLogLevel() int {
 	switch strings.ToLower(os.Getenv(ENV_LOG_LEVEL)) {
 	case "error", "0":
 		return LEVEL_ERROR
+	case "warning", "1":
+		return LEVEL_WARNING
 	case "info", "2":
 		return LEVEL_INFO
 	case "debug", "3":
