@@ -13,7 +13,6 @@ import (
 
 func main() {
 	logStartup("Starting up airvpn-api.")
-
 	initialize()
 	startServer()
 }
@@ -27,7 +26,6 @@ func initialize() {
 
 func initCache() {
 	logStartup("Initializing Cache.")
-
 	appCache = cache.NewCache(config.CacheTtlSeconds)
 }
 
